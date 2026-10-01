@@ -90,8 +90,21 @@
       <div class="live-stat"><div class="n">—</div><div class="l">Public repos</div></div>
       <div class="live-stat"><div class="n">—</div><div class="l">Followers</div></div>
       <div class="live-stat"><div class="n">—</div><div class="l">Stars earned</div></div>
+      <div class="live-stat"><div class="n">—</div><div class="l">Commits</div></div>
+      <div class="live-stat"><div class="n">—</div><div class="l">Pull requests</div></div>
+      <div class="live-stat"><div class="n">—</div><div class="l">Issues</div></div>
     </div>
     <p class="asof" id="live-asof">Loading…</p>
+  </section>
+
+  <section id="social-proof">
+    <h2>Social proof</h2>
+    <p>Real posts, not restated claims — linked directly so you can verify them yourself.</p>
+    <ul>
+      <li><a href="https://www.linkedin.com/posts/david-sunday-david_the-product-management-free-mentorship-cohort-activity-7445524456661495809-XmdS" rel="noopener">LinkedIn — announcing the free product-management mentorship cohort</a></li>
+      <li><a href="https://www.linkedin.com/posts/david-sunday-david_day-4-product-discovery-drives-product-success-activity-7436307573819158529-gUv_" rel="noopener">LinkedIn — Day 4: product discovery drives product success</a></li>
+      <li><a href="https://www.linkedin.com/posts/david-sunday-david_as-one-of-the-judges-at-the-just-concluded-activity-7366946174060224515-lLJR" rel="noopener">LinkedIn — judging TheBuidlathon</a></li>
+    </ul>
   </section>
 
   <section>
@@ -181,11 +194,16 @@
     .then((r) => r.ok ? r.json() : Promise.reject())
     .then((data) => {
       const nodes = document.querySelectorAll('#live-stats .n');
-      nodes[0].textContent = data.public_repos ?? '—';
-      nodes[1].textContent = data.followers ?? '—';
-      nodes[2].textContent = data.total_stars ?? '—';
+      const show = (v) => (v === null || v === undefined ? 'pending' : v);
+      nodes[0].textContent = show(data.public_repos);
+      nodes[1].textContent = show(data.followers);
+      nodes[2].textContent = show(data.total_stars);
+      nodes[3].textContent = show(data.total_commits);
+      nodes[4].textContent = show(data.total_prs);
+      nodes[5].textContent = show(data.total_issues);
       document.getElementById('live-asof').textContent =
-        'Fetched from the GitHub API, updated daily. Last updated: ' + (data.updated_at ?? 'unknown');
+        'Fetched from the GitHub API, updated daily. Last updated: ' + (data.updated_at ?? 'unknown') +
+        (data.total_commits == null ? ' (commit/PR/issue totals pending GH_STATS_TOKEN setup)' : '');
     })
     .catch(() => {
       document.getElementById('live-asof').textContent =

@@ -1,12 +1,22 @@
 name: Update live GitHub stats
 
-# Pulls real, public, keyless GitHub API data for the soyaya account and
-# commits it to data/stats.json, which index.html reads as same-origin
-# static JSON (never a live cross-origin call at a visitor's page-load
-# time). Scoped deliberately to GitHub only: AutoRamp's transaction count,
-# Udemy's enrollment numbers, etc. sit behind other people's private
-# dashboards with no public API - those stay as dated, static figures in
-# PERSONAL-FACTS.md instead of being faked into looking "live".
+# Pulls real GitHub data for the soyaya account and commits it to
+# data/stats.json, which index.html reads as same-origin static JSON
+# (never a live cross-origin call at a visitor's page-load time).
+#
+# Two tiers, deliberately kept separate because they need different auth:
+#  - Repo/follower/star counts: the plain REST API, keyless, public.
+#  - Cumulative commit/PR/issue contributions: GitHub's GraphQL API, which
+#    requires a token even for public data. GH_STATS_TOKEN below should be
+#    a classic PAT with NO scopes checked (or a fine-grained token with no
+#    permissions) - it exists only so GraphQL has an authenticated caller,
+#    not because this needs write/repo access to anything.
+#
+# Scoped deliberately to GitHub only: AutoRamp's transaction count,
+# Udemy's enrollment numbers, LinkedIn/X engagement, etc. sit behind other
+# platforms' private dashboards or APIs this project has no access to -
+# those stay as dated, static/self-reported figures (via /addfact) instead
+# of being faked into looking live.
 on:
   schedule:
     - cron: "17 3 * * *" # once a day - these numbers don't move fast enough to justify more
@@ -23,15 +33,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Fetch GitHub stats for soyaya
+      - name: Fetch REST stats (repos, followers, stars)
         run: |
           set -e
           USER="soyaya"
           user_json=$(curl -sS -H "Accept: application/vnd.github+json" "https://api.github.com/users/$USER")
-          public_repos=$(echo "$user_json" | jq -r '.public_repos // 0')
-          followers=$(echo "$user_json" | jq -r '.followers // 0')
+          echo "public_repos=$(echo "$user_json" | jq -r '.public_repos // 0')" >> "$GITHUB_ENV"
+          echo "followers=$(echo "$user_json" | jq -r '.followers // 0')" >> "$GITHUB_ENV"
+          echo "created_at=$(echo "$user_json" | jq -r '.created_at')" >> "$GITHUB_ENV"
 
-          # Sum stargazers across all public, non-fork repos (paginated).
           total_stars=0
           page=1
           while :; do
@@ -44,13 +54,60 @@ jobs:
             [ "$count" -lt 100 ] && break
             page=$((page + 1))
           done
+          echo "total_stars=$total_stars" >> "$GITHUB_ENV"
 
+      - name: Fetch cumulative contributions (GraphQL, needs GH_STATS_TOKEN)
+        if: ${{ secrets.GH_STATS_TOKEN != '' }}
+        env:
+          GH_STATS_TOKEN: ${{ secrets.GH_STATS_TOKEN }}
+        run: |
+          set -e
+          USER="soyaya"
+          start_date=$(date -u -d "$created_at" +%Y-%m-%d)
+          end_date=$(date -u +%Y-%m-%d)
+
+          total_commits=0
+          total_prs=0
+          total_issues=0
+          total_reviews=0
+          cursor="$start_date"
+
+          while [ "$(date -d "$cursor" +%s)" -lt "$(date -d "$end_date" +%s)" ]; do
+            window_end=$(date -u -d "$cursor + 364 days" +%Y-%m-%d)
+            [ "$(date -d "$window_end" +%s)" -gt "$(date -d "$end_date" +%s)" ] && window_end="$end_date"
+
+            query=$(jq -n --arg login "$USER" \
+              --arg from "${cursor}T00:00:00Z" --arg to "${window_end}T23:59:59Z" \
+              '{query: "query($login:String!,$from:DateTime!,$to:DateTime!){ user(login:$login){ contributionsCollection(from:$from,to:$to){ totalCommitContributions totalPullRequestContributions totalIssueContributions totalPullRequestReviewContributions } } }", variables:{login:$login, from:$from, to:$to}}')
+
+            resp=$(curl -sS -X POST -H "Authorization: bearer $GH_STATS_TOKEN" \
+              -H "Content-Type: application/json" -d "$query" https://api.github.com/graphql)
+
+            total_commits=$((total_commits + $(echo "$resp" | jq -r '.data.user.contributionsCollection.totalCommitContributions // 0')))
+            total_prs=$((total_prs + $(echo "$resp" | jq -r '.data.user.contributionsCollection.totalPullRequestContributions // 0')))
+            total_issues=$((total_issues + $(echo "$resp" | jq -r '.data.user.contributionsCollection.totalIssueContributions // 0')))
+            total_reviews=$((total_reviews + $(echo "$resp" | jq -r '.data.user.contributionsCollection.totalPullRequestReviewContributions // 0')))
+
+            cursor=$(date -u -d "$window_end + 1 day" +%Y-%m-%d)
+          done
+
+          echo "total_commits=$total_commits" >> "$GITHUB_ENV"
+          echo "total_prs=$total_prs" >> "$GITHUB_ENV"
+          echo "total_issues=$total_issues" >> "$GITHUB_ENV"
+          echo "total_reviews=$total_reviews" >> "$GITHUB_ENV"
+
+      - name: Write data/stats.json
+        run: |
           mkdir -p data
           cat > data/stats.json <<EOF
           {
-            "public_repos": $public_repos,
-            "followers": $followers,
-            "total_stars": $total_stars,
+            "public_repos": ${public_repos:-0},
+            "followers": ${followers:-0},
+            "total_stars": ${total_stars:-0},
+            "total_commits": ${total_commits:-null},
+            "total_prs": ${total_prs:-null},
+            "total_issues": ${total_issues:-null},
+            "total_reviews": ${total_reviews:-null},
             "updated_at": "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
           }
           EOF

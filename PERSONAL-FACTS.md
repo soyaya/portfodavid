@@ -87,6 +87,17 @@ draft (by me or anyone) claims something not in this file, that's a bug — flag
   demo day, prize presentation. Mentored 15 post-hackathon projects; RunesCard (formerly
   ChainRemit) is the named scale-up.
 
+## Social proof links (real posts, linked directly — not restated as new claims)
+
+Only including posts whose URL contains your own handle (`david-sunday-david`), so there's no
+ambiguity about authorship. Generic `x.com/i/status/...` links from the source material were
+left out for the same reason — couldn't confirm they're from your account rather than an
+event's.
+
+- linkedin.com/posts/david-sunday-david_the-product-management-free-mentorship-cohort-activity-7445524456661495809-XmdS
+- linkedin.com/posts/david-sunday-david_day-4-product-discovery-drives-product-success-activity-7436307573819158529-gUv_
+- linkedin.com/posts/david-sunday-david_as-one-of-the-judges-at-the-just-concluded-activity-7366946174060224515-lLJR
+
 ## Teaching / courses
 
 - Udemy: *"Product Management for Founders"* — live, 5.00 rating, enrolled students across
