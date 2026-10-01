@@ -1,0 +1,65 @@
+name: Update live GitHub stats
+
+# Pulls real, public, keyless GitHub API data for the soyaya account and
+# commits it to data/stats.json, which index.html reads as same-origin
+# static JSON (never a live cross-origin call at a visitor's page-load
+# time). Scoped deliberately to GitHub only: AutoRamp's transaction count,
+# Udemy's enrollment numbers, etc. sit behind other people's private
+# dashboards with no public API - those stay as dated, static figures in
+# PERSONAL-FACTS.md instead of being faked into looking "live".
+on:
+  schedule:
+    - cron: "17 3 * * *" # once a day - these numbers don't move fast enough to justify more
+  workflow_dispatch: {}
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Fetch GitHub stats for soyaya
+        run: |
+          set -e
+          USER="soyaya"
+          user_json=$(curl -sS -H "Accept: application/vnd.github+json" "https://api.github.com/users/$USER")
+          public_repos=$(echo "$user_json" | jq -r '.public_repos // 0')
+          followers=$(echo "$user_json" | jq -r '.followers // 0')
+
+          # Sum stargazers across all public, non-fork repos (paginated).
+          total_stars=0
+          page=1
+          while :; do
+            repos_json=$(curl -sS -H "Accept: application/vnd.github+json" \
+              "https://api.github.com/users/$USER/repos?per_page=100&page=$page&type=owner")
+            count=$(echo "$repos_json" | jq 'length')
+            [ "$count" -eq 0 ] && break
+            page_stars=$(echo "$repos_json" | jq '[.[] | select(.fork == false) | .stargazers_count] | add // 0')
+            total_stars=$((total_stars + page_stars))
+            [ "$count" -lt 100 ] && break
+            page=$((page + 1))
+          done
+
+          mkdir -p data
+          cat > data/stats.json <<EOF
+          {
+            "public_repos": $public_repos,
+            "followers": $followers,
+            "total_stars": $total_stars,
+            "updated_at": "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          }
+          EOF
+
+      - name: Commit if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/stats.json
+          git diff --staged --quiet && echo "No change" && exit 0
+          git commit -m "Update live GitHub stats"
+          git push
