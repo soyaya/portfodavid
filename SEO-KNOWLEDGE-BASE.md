@@ -44,4 +44,5 @@ confirms these are weaker than a few real links, not just against Google's guide
 
 <!-- SEOLOG_START -->
 - **2026-10-01:** Updated Google Search to enable indexing.
+- **2026-10-06:** Started taking steps to establish a presence on Google.
 <!-- SEOLOG_END -->
