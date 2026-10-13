@@ -102,6 +102,7 @@ event's.
 
 - Udemy: *"Product Management for Founders"* — live, 5.00 rating, enrolled students across
   16 countries (per your own dashboard, Nigeria is the largest segment at ~70%).
+  URL: https://www.udemy.com/course/product-management-for-founders/?referralCode=E0614DB1F72421D62D91
 - YouTube channel: Techinvest — product management / AI content.
 
 ## Existing public profiles (confirmed real, use these exact handles/URLs)
