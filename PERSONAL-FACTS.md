@@ -35,6 +35,12 @@ draft (by me or anyone) claims something not in this file, that's a bug — flag
   Cohort 1 (Jul–Nov 2025, 7 people) produced MetaGauge. Cohort 2 (Jan–Jun 2026, 12 people)
   produced Nexus/NexusCare (health-tech, not yet live — that's expected at this stage, not a
   gap). Cohort 3 started July 2026.
+- **Mihaspay — Co-founder.** Web2 personal finance/financial-management platform. Live at
+  mihaspay.online. No shipped-metric numbers confirmed yet — do not cite user/transaction
+  counts until you confirm them.
+- **Agapay — Co-founder.** Web3 counterpart to Mihaspay — same personal-finance-management
+  concept, built on-chain. Live at agapay.xyz. No shipped-metric numbers confirmed yet — do
+  not cite user/transaction counts until you confirm them.
 
 ## Shipped products (what to actually claim, with real numbers)
 
