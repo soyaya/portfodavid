@@ -117,7 +117,7 @@ event's.
 
 - LinkedIn: linkedin.com/in/david-sunday-david
 - GitHub: github.com/soyaya
-- X/Twitter: x.com/DavidLoveOne
+- X/Twitter: x.com/davidlordlove
 - Instagram: instagram.com/davidlovedavid1015
 - TikTok: vm.tiktok.com/ZS9Uj8PNJTfcG-xYqgW
 - Email (confirmed OK to publish): soyaya1015@gmail.com
