@@ -108,16 +108,21 @@ event's.
 
 - Udemy: *"Product Management for Founders"* — live, 5.00 rating, enrolled students across
   16 countries (per your own dashboard, Nigeria is the largest segment at ~70%).
-  URL: https://www.udemy.com/course/product-management-for-founders/?referralCode=E0614DB1F72421D62D91
+  Course URL: https://www.udemy.com/course/product-management-for-founders/?referralCode=E0614DB1F72421D62D91
+  Instructor profile: https://www.udemy.com/user/david-david-sunday/
 - YouTube channel: Techinvest — product management / AI content.
+  URL: https://www.youtube.com/@techinvest-b8w
 
 ## Existing public profiles (confirmed real, use these exact handles/URLs)
 
 - LinkedIn: linkedin.com/in/david-sunday-david
 - GitHub: github.com/soyaya
-- X/Twitter: referenced via x.com/i/status/... posts — confirm handle before publishing
+- X/Twitter: x.com/DavidLoveOne
+- Instagram: instagram.com/davidlovedavid1015
+- TikTok: vm.tiktok.com/ZS9Uj8PNJTfcG-xYqgW
+- Email (confirmed OK to publish): soyaya1015@gmail.com
 - Selar storefront: "Catfish farming success" by David Love
-- Drips Wave: soyaya
+- Drips Wave: https://www.drips.network/wave/users/c76512e5-8f88-4cad-bdb8-caeb093f2f47
 
 ## Explicitly EXCLUDED until you confirm (per your own document — do not publish these)
 
@@ -132,6 +137,5 @@ event's.
 
 ## Contact
 
-No public contact method confirmed yet. Do not publish davidlovedavid1015@gmail.com or any
-other address without your explicit go-ahead — tell me what you want shown (an email, a
-contact form substitute pointing to LinkedIn, or nothing) and I'll add it.
+Public contact email, confirmed OK to publish: soyaya1015@gmail.com
+Do NOT publish davidlovedavid1015@gmail.com (a different address) — not cleared for public use.
